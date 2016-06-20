@@ -7,9 +7,51 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    integrationTest {
+        java {
+            srcDir 'src/integrationTest/java'
+        }
+        resources {
+            srcDir 'src/integrationTest/resources'
+        }
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+    }
+}
+
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
 dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.assertj:assertj-core:3.4.1'
-    testCompile 'info.cukes:cucumber-java:1.2.4'
-    testCompile 'info.cukes:cucumber-junit:1.2.4'
+    integrationTestCompile 'info.cukes:cucumber-java:1.2.4'
+    integrationTestCompile 'info.cukes:cucumber-junit:1.2.4'
 }
+
+task integrationTest(type: Test) {
+    group 'verification'
+    description 'Runs integration tests'
+    dependsOn assemble, compileIntegrationTestJava
+    mustRunAfter test
+    doLast {
+        javaexec {
+            main = "cucumber.api.cli.Main"
+            classpath = configurations.integrationTestRuntime +
+                    sourceSets.main.output +
+                    sourceSets.integrationTest.output
+            args = ['--plugin', "html:${Reporting.baseDir}/${name}",
+                    '--plugin', "junit:${Reporting.baseDir}/${name}/junit.xml",
+                    '--plugin', 'pretty',
+                    '--glue', 'uk.co.agilekatas.katas', 'src/integrationTest/resources']
+        }
+    }
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    outputs.upToDateWhen { false }
+}
+
+check.dependsOn integrationTest
