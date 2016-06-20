@@ -1,8 +1,11 @@
 # Kata Template
 The [Agile Katas] (http://agilekatas.co.uk/) template for new katas. 
 
-## Included 
-- Gradle Wrapper 2.2
-- JUnit 4.12
-- AssertJ 2.3.0
-- Cucumber 1.2.4
+## Libraries
+
+| Library        | Version |
+|----------------|---------|
+| JUnit          | 4.12    |
+| AssertJ        | 3.4.1   |
+| Cucumber-Java  | 1.2.4   |
+| Cucumber-JUnit | 1.2.4   |
